@@ -21,6 +21,8 @@ import {
     FieldLabel,
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
+import { loginUser } from "@/services/auth";
+import { useRouter } from "next/navigation";
 
 const formSchema = z.object({
     email: z.string().email({ message: "Please provide a valid email." }),
@@ -28,6 +30,9 @@ const formSchema = z.object({
 });
 
 export function LoginForm() {
+
+    const router = useRouter();
+
     const form = useForm<z.infer<typeof formSchema>>({
         resolver: zodResolver(formSchema),
         defaultValues: {
@@ -36,21 +41,22 @@ export function LoginForm() {
         },
     });
 
-    function onSubmit(data: z.infer<typeof formSchema>) {
-        toast("You submitted the following values:", {
-            description: (
-                <pre className="mt-2 w-[320px] overflow-x-auto rounded-md bg-code p-4 text-code-foreground">
-                    <code>{JSON.stringify(data, null, 2)}</code>
-                </pre>
-            ),
-            position: "bottom-right",
-            classNames: {
-                content: "flex flex-col gap-2",
-            },
-            style: {
-                "--border-radius": "calc(var(--radius)  + 4px)",
-            } as React.CSSProperties,
-        });
+    async function onSubmit(data: z.infer<typeof formSchema>) {
+
+        
+
+        console.log("line 40 -- loginForm : ", data);
+        try {
+            const res = await loginUser(data);
+            if (res.success) {
+                toast.success(res.message);
+                router.push("/");
+            } else {
+                toast.success(res.message);
+            }
+        } catch (error) {
+            toast.error(error);
+        }
     }
 
     return (
@@ -77,10 +83,10 @@ export function LoginForm() {
                                         id="form-rhf-demo-title"
                                         aria-invalid={fieldState.invalid}
                                         placeholder="Your email"
-                                        autoComplete="off"
                                     />
                                     {fieldState.invalid && (
-                                        <FieldError className="text-red-500"
+                                        <FieldError
+                                            className="text-red-500"
                                             errors={[fieldState.error]}
                                         />
                                     )}
@@ -100,10 +106,10 @@ export function LoginForm() {
                                         id="form-rhf-demo-title"
                                         aria-invalid={fieldState.invalid}
                                         placeholder="*******"
-                                        autoComplete="off"
                                     />
                                     {fieldState.invalid && (
-                                        <FieldError className="text-red-500"
+                                        <FieldError
+                                            className="text-red-500"
                                             errors={[fieldState.error]}
                                         />
                                     )}
