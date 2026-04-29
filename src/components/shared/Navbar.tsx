@@ -1,17 +1,17 @@
 "use client";
 
 import Link from "next/link";
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Menu } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-// import { getUser, UserLogOut } from "@/services/auth";
+import { getUser, userLogOut } from "@/services/auth";
 
 export default function Navbar() {
     // const [open, setOpen] = useState(false);
-    // const [user, setUser] = useState(null);
-    // const [loading, setLoading] = useState(false);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(false);
 
     const navLinks = [
         { name: "Home", href: "/" },
@@ -19,18 +19,19 @@ export default function Navbar() {
         { name: "About", href: "/about-us" },
         { name: "Contact", href: "/contact" },
     ];
-    // useEffect(() => {
-    //     const getCurrentUser = async () => {
-    //         const userdata = await getUser();
-    //         setUser(userdata);
-    //     };
-    //     getCurrentUser();
-    // }, [loading]);
+    useEffect(() => {
+        const getCurrentUser = async () => {
+            const userdata = await getUser();
+            setUser(userdata);
+            console.log(userdata);
+        };
+        getCurrentUser();
+    }, [loading]);
 
-    // const handleLogOut = () => {
-    //     UserLogOut();
-    //     setLoading(true);
-    // };
+    const handleLogOut = () => {
+        userLogOut();
+        setLoading(true);
+    };
 
     return (
         <header className="bg-background bg-zinc-100">
@@ -51,10 +52,23 @@ export default function Navbar() {
                         </Link>
                     ))}
 
-                    <Button variant="outline"> LogOut</Button>
-                    <Link href={"/login"}>
-                        <Button variant="outline"> Login</Button>
-                    </Link>
+                    {user ? (
+                        <Button
+                            onClick={handleLogOut}
+                            variant="outline"
+                            className="bg-zinc-800 text-white">
+                            LogOut
+                        </Button>
+                    ) : (
+                        <Link href={"/login"}>
+                            <Button
+                                variant="outline"
+                                className="bg-zinc-800 text-white">
+                                {" "}
+                                Login
+                            </Button>
+                        </Link>
+                    )}
                 </nav>
 
                 {/* Mobile Menu */}
@@ -77,9 +91,22 @@ export default function Navbar() {
                                     </Link>
                                 ))}
 
-                                <Button className="w-full">LogOut</Button>
-
-                                <Button className="w-full">Login</Button>
+                                {user ? (
+                                    <Button
+                                        onClick={handleLogOut}
+                                        className="w-full bg-zinc-800 text-white">
+                                        LogOut
+                                    </Button>
+                                ) : (
+                                    <Link href={"/login"}>
+                                        <Button
+                                            variant="outline"
+                                            className="bg-zinc-800 text-white">
+                                            {" "}
+                                            Login
+                                        </Button>
+                                    </Link>
+                                )}
                             </div>
                         </SheetContent>
                     </Sheet>
